@@ -25,12 +25,16 @@ class Dialect_Classifier:
         self.data2 = self.data1
         self.data2['spectral_flux'] = self.data['spectral_flux']        
         scaler = StandardScaler()
-        # self.X1 = scaler.fit_transform(np.array(self.data.iloc[:,:-1], dtype = float))
-        self.X = scaler.fit_transform(np.array(self.data1, dtype = float))
-        # self.X3 = scaler.fit_transform(np.array(data2, dtype = float))
+
+        # Uncomment at a time one of the lines to check the performances of the dataframes as mentioned in the report(in the same order as in the report)
+        # Current dataframe consists of MFCC + Spectral Flux features.
+
+        # self.X = scaler.fit_transform(np.array(self.data.iloc[:,:-1], dtype = float))
+        # self.X = scaler.fit_transform(np.array(self.data1, dtype = float))
+        self.X = scaler.fit_transform(np.array(self.data2, dtype = float))
+        
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.labels, test_size=0.2)
-        # self.X2_train, self.X2_test, self.y2_train, self.y2_test = train_test_split(X2, labels, test_size=0.2)
-        # self.X3_train, self.X3_test, self.y3_train, self.y3_test = train_test_split(X3, labels, test_size=0.2)
+
     def logistic_classifier(self):
         logistic_classifier = linear_model.logistic.LogisticRegression()
         logistic_classifier.fit(self.X_train, self.y_train)
@@ -43,6 +47,7 @@ class Dialect_Classifier:
         print("average = " + str(np.mean(cv_results)) + "\nstd dev = " + str(np.std(cv_results)))
         print(logistic_cm)
         print(classification_report(self.y_test, logistic_predictions))
+
     def svm_classifier(self):
         svm_classifier = svm.SVC()
         svm_classifier.fit(self.X_train, self.y_train)
@@ -55,6 +60,7 @@ class Dialect_Classifier:
         print("average = " + str(np.mean(cv_results)) + "\nstd dev = " + str(np.std(cv_results)))
         print(svm_cm)
         print(classification_report(self.y_test, svm_predictions))
+
     def knn_classifier(self, n):
         knn_classifier = KNeighborsClassifier(n_neighbors = n)
         knn_classifier.fit(self.X_train, self.y_train)
@@ -67,6 +73,7 @@ class Dialect_Classifier:
         print("average = " + str(np.mean(cv_results)) + "\nstd dev = " + str(np.std(cv_results)))
         print(knn_cm)
         print(classification_report(self.y_test, knn_predictions))
+        
     def random_forest_classifier(self):
         rf_classifier = RandomForestClassifier(n_estimators = 1000, random_state = 42)
         rf_classifier.fit(self.X_train, self.y_train)
@@ -83,4 +90,8 @@ class Dialect_Classifier:
 if __name__ == '__main__':
     warnings.filterwarnings("ignore")
     dialect_classifier = Dialect_Classifier('data.csv')
+    dialect_classifier.logistic_classifier()
     dialect_classifier.svm_classifier()
+    dialect_classifier.knn_classifier(3)
+    dialect_classifier.knn_classifier(5)
+    dialect_classifier.random_forest_classifier()
